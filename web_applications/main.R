@@ -26,6 +26,8 @@ require(report)
 require(pwr)
 require(pwrss)
 require(shiny)
+# Load data that are preprocessed to be in the required format
 load("clean_Data.RData")
+# Call the "runApp" command to access the GUI of web applications
 runApp("CompareDIMs")
 runApp("RankDIMs")
