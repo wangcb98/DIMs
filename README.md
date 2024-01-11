@@ -1,3 +1,2 @@
 # DIMs
-Created by Chenbo Wang on 11 Jan 2024
-This folder contains supplementary materials and source files related to the Disaster Impact Metrics (DIMs) project. For more information please go to <http://www.chenbo-wang.com/projects.html>
+This Github project was created by Chenbo Wang on 11 Jan 2024. This folder contains supplementary materials and source files related to the Disaster Impact Metrics (DIMs) project. The DIMs project is funded by the University College London (UCL) Fellowship Incubator Awards, and the University College London Overseas Research Scholarship (UCL-ORS), and UKRI GCRF under grant NE/S009000/1, Tomorrow’s Cities Hub. For more information please go to <http://www.chenbo-wang.com/projects.html>.
