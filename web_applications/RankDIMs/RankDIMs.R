@@ -1,10 +1,10 @@
 # Created by Chenbo Wang on 12 Sep 2023
 # Args:
-# t: "2 weeks", "6 months", "over 6 months"
-# which_group: "Resident", "Beneficiary", or "Both"
+# t: "two weeks", "six months", "over six months"
+# which_group: "Resident", "Other stakeholders", or "Both"
 # wts: a vector containing two fractions that sum up to 1: c(weight_resident, weight_beneficiary)
 
-RankDIMs <- function(A, t, which_group, wts,num){
+RankDIMs <- function(A, t, wts,num){
   load("clean_Data.RData")
   # extract the mean importance rating for immediate household, neighbourhood, and region 
   # for the specified stakeholder group(s)
@@ -50,28 +50,28 @@ RankDIMs <- function(A, t, which_group, wts,num){
                        "B66") # spatial questions
   tbl_hh <- as_tibble(
     data.frame(
-      matrix(nrow=(nrow(Dt_Ben.short)+nrow(Dt_Res.short)),ncol=(1+length(id_DIMs_hh)+length(id_DIMs_spatial)))
+      matrix(nrow=(nrow(Dt_Oth.short)+nrow(Dt_Res.short)),ncol=(1+length(id_DIMs_hh)+length(id_DIMs_spatial)))
     )
   )
   colnames(tbl_hh) <- c("stakeholder",c(id_DIMs_hh,id_DIMs_spatial))
   tbl_neighbour <- as_tibble(
     data.frame(
-      matrix(nrow=(nrow(Dt_Ben.short)+nrow(Dt_Res.short)),ncol=(1+length(id_DIMs_neighbour)+length(id_DIMs_spatial)))
+      matrix(nrow=(nrow(Dt_Oth.short)+nrow(Dt_Res.short)),ncol=(1+length(id_DIMs_neighbour)+length(id_DIMs_spatial)))
     )
   )
   colnames(tbl_neighbour) <- c("stakeholder",c(id_DIMs_neighbour,id_DIMs_spatial))
   tbl_region <- as_tibble(
     data.frame(
-      matrix(nrow=(nrow(Dt_Ben.short)+nrow(Dt_Res.short)),ncol=(1+length(id_DIMs_region)+length(id_DIMs_spatial)))
+      matrix(nrow=(nrow(Dt_Oth.short)+nrow(Dt_Res.short)),ncol=(1+length(id_DIMs_region)+length(id_DIMs_spatial)))
     )
   )
   colnames(tbl_region) <- c("stakeholder",c(id_DIMs_region,id_DIMs_spatial))
   
-  tbl_hh["stakeholder"]<-c(rep("Resident",nrow(Dt_Res.short)),rep("Beneficiary",nrow(Dt_Ben.short)))
-  tbl_neighbour["stakeholder"]<-c(rep("Resident",nrow(Dt_Res.short)),rep("Beneficiary",nrow(Dt_Ben.short)))
-  tbl_region["stakeholder"]<-c(rep("Resident",nrow(Dt_Res.short)),rep("Beneficiary",nrow(Dt_Ben.short)))
+  tbl_hh["stakeholder"]<-c(rep("Resident",nrow(Dt_Res.short)),rep("Other stakeholders",nrow(Dt_Oth.short)))
+  tbl_neighbour["stakeholder"]<-c(rep("Resident",nrow(Dt_Res.short)),rep("Other stakeholders",nrow(Dt_Oth.short)))
+  tbl_region["stakeholder"]<-c(rep("Resident",nrow(Dt_Res.short)),rep("Other stakeholders",nrow(Dt_Oth.short)))
   
-  switch(t, `2 weeks`={ handle <- 1}, `6 months`={handle <- 2}, `over 6 months`={handle <- 4})
+  switch(t, `two weeks`={ handle <- 1}, `six months`={handle <- 2}, `over six months`={handle <- 4})
   for (DIMs in id_DIMs_hh){
     temp.Res <- unlist(Dt_Res.short[,DIMs])
     if (DIMs %in% c("B1.1","B1.2","B2.1","B2.2","B3.1","B3.2","B4.1","B4.2","B5.1","B5.2")){
@@ -79,8 +79,8 @@ RankDIMs <- function(A, t, which_group, wts,num){
     }else{
       temp.Res <- as.integer(temp.Res[seq(handle,250,by=5)])
     }
-    temp.Ben <- unlist(Dt_Ben.short[,DIMs])
-    temp.Ben <- as.integer(temp.Ben[seq(handle,228,by=6)])
+    temp.Ben <- unlist(Dt_Oth.short[,DIMs])
+    temp.Ben <- as.integer(temp.Ben[seq(handle,240,by=6)])
     tbl_hh[DIMs] <- c(temp.Res,temp.Ben)
   }
   for (DIMs in id_DIMs_neighbour){
@@ -90,8 +90,8 @@ RankDIMs <- function(A, t, which_group, wts,num){
     }else{
       temp.Res <- as.integer(temp.Res[seq(handle,250,by=5)])
     }
-    temp.Ben <- unlist(Dt_Ben.short[,DIMs])
-    temp.Ben <- as.integer(temp.Ben[seq(handle,228,by=6)])
+    temp.Ben <- unlist(Dt_Oth.short[,DIMs])
+    temp.Ben <- as.integer(temp.Ben[seq(handle,240,by=6)])
     tbl_neighbour[DIMs] <- c(temp.Res,temp.Ben)
   }
   for (DIMs in id_DIMs_region){
@@ -101,19 +101,19 @@ RankDIMs <- function(A, t, which_group, wts,num){
     }else{
       temp.Res <- as.integer(temp.Res[seq(handle,250,by=5)])
     }
-    temp.Ben <- unlist(Dt_Ben.short[,DIMs])
-    temp.Ben <- as.integer(temp.Ben[seq(handle,228,by=6)])
+    temp.Ben <- unlist(Dt_Oth.short[,DIMs])
+    temp.Ben <- as.integer(temp.Ben[seq(handle,240,by=6)])
     tbl_region[DIMs] <- c(temp.Res,temp.Ben)
   }
   for (DIMs in id_DIMs_spatial){
     temp.Res <- unlist(Dt_Res.short[,DIMs])
-    temp.Ben <- unlist(Dt_Ben.short[,DIMs])
+    temp.Ben <- unlist(Dt_Oth.short[,DIMs])
     temp.Res_hh <- as.integer(temp.Res[seq(1,250,by=5)])
     temp.Res_neighbour <- as.integer(temp.Res[seq(2,250,by=5)])
     temp.Res_region <- as.integer(temp.Res[seq(3,250,by=5)])
-    temp.Ben_hh <- as.integer(temp.Ben[seq(1,228,by=6)])
-    temp.Ben_neighbour <- as.integer(temp.Ben[seq(2,228,by=6)])
-    temp.Ben_region <- as.integer(temp.Ben[seq(3,228,by=6)])
+    temp.Ben_hh <- as.integer(temp.Ben[seq(1,240,by=6)])
+    temp.Ben_neighbour <- as.integer(temp.Ben[seq(2,240,by=6)])
+    temp.Ben_region <- as.integer(temp.Ben[seq(3,240,by=6)])
     tbl_hh[DIMs] <- c(temp.Res_hh,temp.Ben_hh)
     tbl_neighbour[DIMs] <- c(temp.Res_neighbour,temp.Ben_neighbour)
     tbl_region[DIMs] <- c(temp.Res_region,temp.Ben_region)
@@ -126,25 +126,13 @@ RankDIMs <- function(A, t, which_group, wts,num){
   tbl_neighbour[,c(2:ncol(tbl_neighbour))]<-tbl_neighbour[,c(2:ncol(tbl_neighbour))]-1
   tbl_region[,c(2:ncol(tbl_region))]<-tbl_region[,c(2:ncol(tbl_region))]-1
   
-  switch(which_group, 
-         `Resident`={
-           weighted_mean_hh<-colMeans(tbl_hh[tbl_hh$stakeholder=="Resident",id_DIMs_hh],na.rm=T)
-           weighted_mean_neighbour<-colMeans(tbl_neighbour[tbl_neighbour$stakeholder=="Resident",id_DIMs_neighbour],na.rm=T)
-           weighted_mean_region<-colMeans(tbl_region[tbl_region$stakeholder=="Resident",id_DIMs_region],na.rm=T)
-         }, 
-         `Beneficiary`={
-           weighted_mean_hh<-colMeans(tbl_hh[tbl_hh$stakeholder=="Beneficiary",id_DIMs_hh],na.rm=T)
-           weighted_mean_neighbour<-colMeans(tbl_neighbour[tbl_neighbour$stakeholder=="Beneficiary",id_DIMs_neighbour],na.rm=T)
-           weighted_mean_region<-colMeans(tbl_region[tbl_region$stakeholder=="Beneficiary",id_DIMs_region],na.rm=T)
-         }, 
-         `Both`={
-           weighted_mean_hh<-wts[1]*colMeans(tbl_hh[tbl_hh$stakeholder=="Resident",id_DIMs_hh],na.rm=T)+wts[2]*colMeans(tbl_hh[tbl_hh$stakeholder=="Beneficiary",id_DIMs_hh],na.rm=T)
-           weighted_mean_neighbour<-wts[1]*colMeans(tbl_neighbour[tbl_neighbour$stakeholder=="Resident",id_DIMs_neighbour],na.rm=T)+wts[2]*colMeans(tbl_neighbour[tbl_neighbour$stakeholder=="Beneficiary",id_DIMs_neighbour],na.rm=T)
-           weighted_mean_region<-wts[1]*colMeans(tbl_region[tbl_region$stakeholder=="Resident",id_DIMs_region],na.rm=T)+wts[2]*colMeans(tbl_region[tbl_region$stakeholder=="Beneficiary",id_DIMs_region],na.rm=T)}
-  )
+  weighted_mean_hh<-wts[1]*colMeans(tbl_hh[tbl_hh$stakeholder=="Resident",id_DIMs_hh],na.rm=T)+wts[2]*colMeans(tbl_hh[tbl_hh$stakeholder=="Other stakeholders",id_DIMs_hh],na.rm=T)
+  weighted_mean_neighbour<-wts[1]*colMeans(tbl_neighbour[tbl_neighbour$stakeholder=="Resident",id_DIMs_neighbour],na.rm=T)+wts[2]*colMeans(tbl_neighbour[tbl_neighbour$stakeholder=="Other stakeholders",id_DIMs_neighbour],na.rm=T)
+  weighted_mean_region<-wts[1]*colMeans(tbl_region[tbl_region$stakeholder=="Resident",id_DIMs_region],na.rm=T)+wts[2]*colMeans(tbl_region[tbl_region$stakeholder=="Other stakeholders",id_DIMs_region],na.rm=T)
   weighted_mean_hh[is.na(weighted_mean_hh)]<-0
   weighted_mean_neighbour[is.na(weighted_mean_neighbour)]<-0
   weighted_mean_region[is.na(weighted_mean_region)]<-0
+  
   df.hh<-tibble(
     DIM=id_DIMs_hh[order(weighted_mean_hh, decreasing = T)],
     Score=sort(weighted_mean_hh, decreasing = T))
@@ -156,33 +144,33 @@ RankDIMs <- function(A, t, which_group, wts,num){
     Score=sort(weighted_mean_region, decreasing = T))
   # exclude spatial ones that do not belong to the associated time stamp
   switch(t, 
-         `2 weeks`={
+         `two weeks`={
            df.hh<-df.hh[!df.hh$DIM %in% c("B33","B38"),]
            df.neighbour<-df.neighbour[!df.neighbour$DIM %in% c("B33","B38"),]
            df.region<-df.region[!df.region$DIM %in% c("B33","B38"),]
          }, 
-         `6 months`={
+         `six months`={
            df.hh<-df.hh[!df.hh$DIM %in% c("B31","B32","B62","B63","B64","B65","B66"),]
            df.neighbour<-df.neighbour[!df.neighbour$DIM %in% c("B31","B32","B62","B63","B64","B65","B66"),]
            df.region<-df.region[!df.region$DIM %in% c("B31","B32","B62","B63","B64","B65","B66"),]
          }, 
-         `over 6 months`={
+         `over six months`={
            df.hh<-df.hh[!df.hh$DIM %in% c("B31","B32","B62","B63","B64","B65","B66"),]
            df.neighbour<-df.neighbour[!df.neighbour$DIM %in% c("B31","B32","B62","B63","B64","B65","B66"),]
            df.region<-df.region[!df.region$DIM %in% c("B31","B32","B62","B63","B64","B65","B66"),]
          }
   )
-  labels_DIMs_spatial <- c("Acute severe injuries occur", # 2 weeks
-                           "Fatalities occur", # 2 weeks 
-                           "Chronic diseases develop", # 6 months and >6 months
-                           "Permanent displacement occurs", # 6 months and >6 months
-                           "Voluntary relocation occurs", # 2 weeks, 6 months and >6 months
-                           "Connection with family and friends is permanently lost", # 2 weeks, 6 months and >6 months
-                           "Damage to buildings leads to direct economic loss for building owners", # 2 weeks
-                           "Damage to transportation networks leads to direct economic loss for operators", # 2 weeks
-                           "Damage to utility networks leads to direct economic loss for operators", # 2 weeks
-                           "Damage to telecommunication networks leads to direct economic loss for operators", # 2 weeks
-                           "Damage to the natural environment leads to direct economic loss for relevant stakeholders") # 2 weeks
+  labels_DIMs_spatial <- c("Acute severe injuries occur", # two weeks
+                           "Fatalities occur", # two weeks 
+                           "Chronic diseases develop", # six months and >six months
+                           "Permanent displacement occurs", # six months and >six months
+                           "Voluntary relocation occurs", # two weeks, six months and >six months
+                           "Connection with family and friends is permanently lost", # two weeks, six months and >six months
+                           "Damage to buildings leads to direct economic loss for building owners", # two weeks
+                           "Damage to transportation networks leads to direct economic loss for operators", # two weeks
+                           "Damage to utility networks leads to direct economic loss for operators", # two weeks
+                           "Damage to telecommunication networks leads to direct economic loss for operators", # two weeks
+                           "Damage to the natural environment leads to direct economic loss for relevant stakeholders") # two weeks
   labels_DIMs_hh <- c("Access to good-quality soil is lost",
                       "Access to clean air is lost",
                       "Access to green infrastructure is lost",
@@ -335,14 +323,14 @@ RankDIMs <- function(A, t, which_group, wts,num){
   df.region$Score[df.region$Score>=4]<-4
   
   ratio_importance<-tibble(matrix(nrow=3,ncol=3))
-  colnames(ratio_importance)<-c("space","ratio of residual importance","ratio of importance")
+  colnames(ratio_importance)<-c("space","positive importance ratio","total importance ratio")
   ratio_importance$space<-c("household","neighbourhood","region")
-  ratio_importance$`ratio of residual importance`<-c(
+  ratio_importance$`positive importance ratio`<-c(
     sum(df.hh$Score[1:num]-2)/sum(df.hh$Score[df.hh$Score>2]-2),
     sum(df.neighbour$Score[1:num]-2)/sum(df.neighbour$Score[df.neighbour$Score>2]-2),
     sum(df.region$Score[1:num]-2)/sum(df.region$Score[df.region$Score>2]-2)
   )
-  ratio_importance$`ratio of importance`<-c(
+  ratio_importance$`total importance ratio`<-c(
     sum(df.hh$Score[1:num])/sum(df.hh$Score), # ratio of importance accounted for by top num DIMs
     sum(df.neighbour$Score[1:num])/sum(df.neighbour$Score),
     sum(df.region$Score[1:num])/sum(df.region$Score)
@@ -352,11 +340,11 @@ RankDIMs <- function(A, t, which_group, wts,num){
   score.A <- c(df.hh$Score[rank.A],df.neighbour$Score[rank.A],df.region$Score[rank.A])
   result.A <- paste0("The selected disaster impact is ranked #",rank.A[1]," at the household level, with an average weighted importance score of ",format(score.A[1], digits = 4),
                      ", #",rank.A[2]," at the neighbourhood level, with an average weighted importance score of ",format(score.A[2], digits = 4),
-                     ", and #",rank.A[3]," at the region level, with an average weighted importance score of ",format(score.A[3], digits = 4))
+                     ", and #",rank.A[3]," at the region level, with an average weighted importance score of ",format(score.A[3], digits = 4),".")
   plot.1 <- ggplot(df.hh[1:num,], aes(x = DIM, y = Score))+
     geom_bar(stat="identity",fill="lightblue",width=0.6) + coord_flip() + 
     ylab(expression(""*S[DIM[i]]*"")) +
-    xlab(paste0("Disaster impacts ranked top ",num, " at the household level at ", t, " after the disaster")) + 
+    xlab(paste0("Disaster impacts ranked top ",num, " at the household level at ", t, " after a hazard event")) + 
     theme_grey(base_size = 20) +
     scale_y_continuous(breaks=c(0,1,2,3,4),
                        limits=c(0,4),
@@ -367,7 +355,7 @@ RankDIMs <- function(A, t, which_group, wts,num){
   plot.2 <- ggplot(df.neighbour[1:num,], aes(x = DIM, y = Score))+
     geom_bar(stat="identity",fill="darkblue",width=0.6) + coord_flip() + 
     ylab(expression(""*S[DIM[i]]*"")) +
-    xlab(paste0("Disaster impacts ranked top ",num, " at the neighbourhood level at ", t, " after the disaster")) + 
+    xlab(paste0("Disaster impacts ranked top ",num, " at the neighbourhood level at ", t, " after a hazard event")) + 
     theme_grey(base_size = 20) +
     scale_y_continuous(breaks=c(0,1,2,3,4),
                        limits=c(0,4),
@@ -378,13 +366,17 @@ RankDIMs <- function(A, t, which_group, wts,num){
   plot.3 <- ggplot(df.region[1:num,], aes(x = DIM, y = Score))+
     geom_bar(stat="identity",fill="darkred",width=0.6) + coord_flip() + 
     ylab(expression(""*S[DIM[i]]*"")) +
-    xlab(paste0("Disaster impacts ranked top ",num, " at the region level at ", t, " after the disaster")) + 
+    xlab(paste0("Disaster impacts ranked top ",num, " at the region level at ", t, " after a hazard event")) + 
     theme_grey(base_size = 20) +
     scale_y_continuous(breaks=c(0,1,2,3,4),
                        limits=c(0,4),
                        labels=c("0\nUnimportant","1\nSomewhat \nunimportant","2\nNeither important \nnor unimportant","3\nSomewhat \nimportant","4\nImportant")) +
     scale_x_discrete(labels = label_wrap(60)) +
     labs(title = paste0("Weights: Residents - ",wts[1],", Other stakeholders - ",wts[2]))
+  df.hh <- rename(df.hh, Disaster.impact=DIM)
+  df.neighbour <- rename(df.neighbour, Disaster.impact=DIM)
+  df.region <- rename(df.region, Disaster.impact=DIM)
+  
   return(list(df.hh,
               df.neighbour,
               df.region,
